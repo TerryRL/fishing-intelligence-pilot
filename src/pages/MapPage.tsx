@@ -59,7 +59,7 @@ export default function MapPage() {
       if (layer instanceof L.Marker) map.removeLayer(layer)
     })
 
-    const bounds: L.LatLngExpression[] = []
+    const bounds: L.LatLngTuple[] = []
     points.forEach((point) => {
       const icon = L.divIcon({
         className: 'custom-map-marker',
@@ -72,7 +72,7 @@ export default function MapPage() {
     })
 
     if (bounds.length > 1) map.fitBounds(bounds, { padding: [30, 30] })
-    else if (bounds.length === 1) map.setView(bounds[0] as L.LatLngExpression, 13)
+    else if (bounds.length === 1) map.setView(bounds[0], 13)
   }, [points])
 
   return (
