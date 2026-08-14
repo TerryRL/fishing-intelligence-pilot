@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import { useAppData } from '../contexts/AppDataContext'
 import { fetchSpots } from '../services/dataService'
 import type { FishingSpot } from '../types/domain'
 
 export default function MapPage() {
+  const navigate = useNavigate()
   const { catches } = useAppData()
   const [spots, setSpots] = useState<FishingSpot[]>([])
   const [year, setYear] = useState('all')
@@ -29,6 +31,7 @@ export default function MapPage() {
       .filter((row) => selectedYear === null || new Date(row.caught_at).getFullYear() === selectedYear)
       .map((row) => ({
         kind: 'catch' as const,
+        id: row.id,
         latitude: row.latitude as number,
         longitude: row.longitude as number,
         label: `${row.species?.common_name ?? 'Fish'} · ${new Date(row.caught_at).getFullYear()}${row.lure?.product_name ? ` · ${row.lure.product_name}` : ''}`,
@@ -38,6 +41,7 @@ export default function MapPage() {
       .filter((row) => selectedYear === null || new Date(row.created_at).getFullYear() === selectedYear)
       .map((row) => ({
         kind: 'spot' as const,
+        id: row.id,
         latitude: row.latitude,
         longitude: row.longitude,
         label: `${row.name || row.structure_type || 'Fishing spot'} · ${new Date(row.created_at).getFullYear()}`,
@@ -76,13 +80,19 @@ export default function MapPage() {
         iconSize: [34, 34],
         iconAnchor: [17, 17],
       })
-      L.marker([point.latitude, point.longitude], { icon }).addTo(map).bindPopup(point.label)
+      const marker = L.marker([point.latitude, point.longitude], { icon }).addTo(map)
+      if (point.kind === 'catch') {
+        marker.bindTooltip(`${point.label} · Tap for details`, { direction: 'top' })
+        marker.on('click', () => navigate(`/catches/${point.id}`))
+      } else {
+        marker.bindPopup(point.label)
+      }
       bounds.push([point.latitude, point.longitude])
     })
 
     if (bounds.length > 1) map.fitBounds(bounds, { padding: [30, 30] })
     else if (bounds.length === 1) map.setView(bounds[0], 13)
-  }, [points])
+  }, [points, navigate])
 
   return (
     <div className="page map-page">
@@ -101,12 +111,12 @@ export default function MapPage() {
       </section>
 
       <div className="map-legend">
-        <span><i className="legend-catch">◆</i> Catches</span>
+        <span><i className="legend-catch">◆</i> Catches — tap for details</span>
         <span><i className="legend-spot">⌖</i> Spots</span>
       </div>
       <div className="map-canvas" ref={mapEl} />
       {points.length === 0 && <div className="empty-card"><strong>No mapped activity for this period.</strong><p>Choose another year or All Activity.</p></div>}
-      <p className="insight-note">Use the year selector to compare where fish were caught over time. Catch pop-ups include species and year so changes in location and species are easier to spot.</p>
+      <p className="insight-note">Tap any catch marker to see its lake, date, time, lure, size, location, notes and submitted photo.</p>
     </div>
   )
 }
