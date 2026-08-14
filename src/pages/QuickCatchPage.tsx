@@ -100,6 +100,12 @@ export default function QuickCatchPage() {
             </button>
           ))}
         </div>
+        <label style={{ marginTop: 12 }}>All fish
+          <select value={speciesId} onChange={(e) => setSpeciesId(e.target.value)}>
+            <option value="">Select any fish…</option>
+            {species.map((row) => <option key={row.id} value={row.id}>{row.common_name}</option>)}
+          </select>
+        </label>
       </section>
 
       <section>
