@@ -42,6 +42,16 @@ interface AppDataValue {
 
 const AppDataContext = createContext<AppDataValue | null>(null)
 
+function visibleSpecies(rows: Species[]): Species[] {
+  const overriddenDefaults = new Set(
+    rows.filter((row) => row.user_id && row.source_species_id).map((row) => row.source_species_id as string),
+  )
+  return rows
+    .filter((row) => row.is_active !== false)
+    .filter((row) => row.user_id || !overriddenDefaults.has(row.id))
+    .sort((a, b) => a.sort_order - b.sort_order || a.common_name.localeCompare(b.common_name))
+}
+
 export function AppDataProvider({ children }: PropsWithChildren) {
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
@@ -70,7 +80,7 @@ export function AppDataProvider({ children }: PropsWithChildren) {
           fetchActiveTrip(),
         ])
       setWaterBodies(waterRows)
-      setSpecies(speciesRows)
+      setSpecies(visibleSpecies(speciesRows))
       setLures(lureRows)
       setTrips(tripRows)
       setEvents(eventRows)
@@ -86,16 +96,18 @@ export function AppDataProvider({ children }: PropsWithChildren) {
   const refreshActive = useCallback(async () => {
     if (!user) return
     try {
-      const [active, eventRows, catchRows, lureRows] = await Promise.all([
+      const [active, eventRows, catchRows, lureRows, speciesRows] = await Promise.all([
         fetchActiveTrip(),
         fetchEvents(),
         fetchCatches(),
         fetchLures(),
+        fetchSpecies(),
       ])
       setActiveTrip(active)
       setEvents(eventRows)
       setCatches(catchRows)
       setLures(lureRows)
+      setSpecies(visibleSpecies(speciesRows))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not refresh active trip.')
     }
