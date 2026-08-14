@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppData } from '../contexts/AppDataContext'
-import { updateTripCurrentLure } from '../services/dataService'
+import { signedPhotoUrl, updateTripCurrentLure } from '../services/dataService'
 
 export default function ChangeLurePage() {
   const navigate = useNavigate()
@@ -9,6 +9,20 @@ export default function ChangeLurePage() {
   const [search, setSearch] = useState('')
   const [busyId, setBusyId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [photoUrls, setPhotoUrls] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    let cancelled = false
+    void Promise.all(
+      lures.filter((l) => l.photo_path).map(async (lure) => [lure.id, await signedPhotoUrl(lure.photo_path as string)] as const),
+    ).then((pairs) => {
+      if (cancelled) return
+      const next: Record<string, string> = {}
+      pairs.forEach(([id, url]) => { if (url) next[id] = url })
+      setPhotoUrls(next)
+    })
+    return () => { cancelled = true }
+  }, [lures])
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -50,7 +64,9 @@ export default function ChangeLurePage() {
       disabled={Boolean(busyId)}
       onClick={() => void choose(lure.id)}
     >
-      <span className="lure-glyph">⌁</span>
+      <span className="lure-glyph" style={{ width: 44, height: 44, borderRadius: 10, overflow: 'hidden', display: 'grid', placeItems: 'center', background: '#143b58' }}>
+        {photoUrls[lure.id] ? <img src={photoUrls[lure.id]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '⌁'}
+      </span>
       <span className="lure-row-copy">
         <strong>{lure.product_name}</strong>
         <small>{[lure.primary_colour, lure.category].filter(Boolean).join(' · ')}</small>
