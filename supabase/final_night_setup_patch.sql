@@ -1,8 +1,27 @@
 -- Fishing Intelligence final night setup patch
--- Run once in Supabase Dashboard > SQL Editor > New query.
--- Adds per-user species customization and persistent custom waterway types.
+-- Run ONCE in Supabase Dashboard > SQL Editor > New query.
+-- This safely adds Ontario fish defaults, per-user fish customization, and persistent custom waterway types.
 
--- 1) Species can now be global defaults (user_id is null) or user-owned copies/custom entries.
+-- A) Add the expanded Ontario fish defaults while the original global species uniqueness is still present.
+insert into public.species (common_name, scientific_name, sort_order) values
+  ('Rock Bass', 'Ambloplites rupestris', 115),
+  ('White Crappie', 'Pomoxis annularis', 116),
+  ('White Bass', 'Morone chrysops', 117),
+  ('Sauger', 'Sander canadensis', 118),
+  ('Burbot', 'Lota lota', 119),
+  ('Cisco (Lake Herring)', 'Coregonus artedi', 121),
+  ('Brown Bullhead', 'Ameiurus nebulosus', 122),
+  ('Black Bullhead', 'Ameiurus melas', 123),
+  ('Yellow Bullhead', 'Ameiurus natalis', 124),
+  ('Freshwater Drum', 'Aplodinotus grunniens', 125),
+  ('Bowfin', 'Amia calva', 126),
+  ('White Sucker', 'Catostomus commersonii', 127),
+  ('Longnose Gar', 'Lepisosteus osseus', 128)
+on conflict (common_name) do update
+set scientific_name = excluded.scientific_name,
+    sort_order = excluded.sort_order;
+
+-- B) Species can now be global defaults (user_id is null) or user-owned copies/custom entries.
 alter table public.species add column if not exists user_id uuid references auth.users(id) on delete cascade;
 alter table public.species add column if not exists source_species_id uuid references public.species(id) on delete set null;
 alter table public.species add column if not exists photo_path text;
@@ -41,7 +60,7 @@ create policy "species_delete_own" on public.species
   for delete to authenticated
   using (user_id = (select auth.uid()));
 
--- 2) Persistent user-defined waterway types.
+-- C) Persistent user-defined waterway types.
 create table if not exists public.waterway_types (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -61,6 +80,7 @@ create policy "waterway_types_insert_own" on public.waterway_types
 create policy "waterway_types_delete_own" on public.waterway_types
   for delete to authenticated using (user_id = (select auth.uid()));
 
+-- Verification summary.
 select
   (select count(*) from public.species where user_id is null) as default_species,
   (select count(*) from public.waterway_types) as custom_waterway_types;
