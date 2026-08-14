@@ -6,12 +6,12 @@ type FishIconProps = {
 
 function family(species: string) {
   const s = species.toLowerCase()
-  if (s.includes('pike') || s.includes('musk')) return 'long'
+  if (s.includes('pike') || s.includes('musk') || s.includes('gar') || s.includes('eel')) return 'long'
   if (s.includes('catfish') || s.includes('bullhead')) return 'catfish'
   if (s.includes('sunfish') || s.includes('bluegill') || s.includes('crappie') || s.includes('rock bass')) return 'panfish'
-  if (s.includes('trout') || s.includes('salmon') || s.includes('char')) return 'trout'
-  if (s.includes('carp') || s.includes('drum') || s.includes('bowfin')) return 'deep'
-  if (s.includes('whitefish') || s.includes('cisco') || s.includes('smelt')) return 'silver'
+  if (s.includes('trout') || s.includes('salmon') || s.includes('char') || s.includes('splake')) return 'trout'
+  if (s.includes('carp') || s.includes('drum') || s.includes('bowfin') || s.includes('sturgeon')) return 'deep'
+  if (s.includes('whitefish') || s.includes('cisco') || s.includes('shiner')) return 'silver'
   if (s.includes('walleye') || s.includes('sauger') || s.includes('perch')) return 'perch'
   if (s.includes('bass')) return 'bass'
   return 'standard'
