@@ -183,7 +183,7 @@ export default function InsightsPage() {
         <div className="section-heading"><h2>Top lures</h2></div>
         <label style={{ marginBottom: 14 }}>Chart metric<select value={chartMetric} onChange={(e) => setChartMetric(e.target.value as ChartMetric)}>{Object.entries(metricLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
         <div style={{ width: '100%', border: '1px solid #21445d', borderRadius: 14, background: '#0c2538', padding: '16px 4px 8px', overflow: 'hidden' }}>
-          <div style={{ width: '100%', height: 245, display: 'grid', gridTemplateColumns: `repeat(${Math.max(1, chartRows.length)}, minmax(0, 1fr))`, gap: 0, alignItems: 'end' }}>
+          <div style={{ width: '100%', height: 245, display: 'grid', gridTemplateColumns: 'repeat(10, minmax(0, 1fr))', gap: 0, alignItems: 'end' }}>
             {chartRows.map((row) => {
               const value = row[chartMetric]
               const height = Math.max(3, (value / chartMax) * 165)
