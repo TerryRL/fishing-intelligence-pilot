@@ -34,8 +34,12 @@ export interface WaterBody {
 
 export interface Species {
   id: string
+  user_id: string | null
+  source_species_id: string | null
   common_name: string
   scientific_name: string | null
+  photo_path: string | null
+  is_active: boolean
   sort_order: number
 }
 
