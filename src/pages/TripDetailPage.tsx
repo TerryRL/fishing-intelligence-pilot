@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppData } from '../contexts/AppDataContext'
-import { activeStats, buildLurePerformance, conversionRate } from '../utils/analytics'
+import { activeStats, buildLurePerformance, landingConversion } from '../utils/analytics'
 import { formatDate, formatDuration, formatTime } from '../utils/format'
 import { requireSupabase } from '../lib/supabase'
 import { signedPhotoUrl } from '../services/dataService'
@@ -65,7 +65,7 @@ export default function TripDetailPage() {
     : Math.max(0, (Date.now() - new Date(trip.started_at).getTime()) / 60_000)
   const fishRate = stats.fish / Math.max(1 / 60, durationMinutes / 60)
   const lurePerf = buildLurePerformance([trip], tripEvents, tripCatches, lures)
-  const conversion = conversionRate(stats.fish, stats.bites)
+  const conversion = landingConversion(stats.bites, stats.fish)
 
   return (
     <div className="page">
@@ -103,8 +103,9 @@ export default function TripDetailPage() {
         <div className="section-heading"><h2>Trip metrics</h2></div>
         <div className="info-list">
           <div><span>Fish / 100 casts</span><strong>{stats.casts ? ((stats.fish / stats.casts) * 100).toFixed(2) : '—'}</strong></div>
-          <div><span>Bite → landed conversion</span><strong>{conversion === null ? '—' : `${conversion}%`}</strong></div>
+          <div><span>Strike → landed conversion</span><strong>{conversion === null ? '—' : `${conversion}%`}</strong></div>
         </div>
+        <p className="muted">Conversion = catches ÷ (logged bites + catches).</p>
       </section>
 
       <section>
