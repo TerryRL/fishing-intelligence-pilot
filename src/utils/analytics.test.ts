@@ -42,7 +42,7 @@ describe('analytics helpers', () => {
     const lures = [
       { id: 'a', product_name: 'Lure A' },
       { id: 'b', product_name: 'Lure B' },
-    ] as Lure[]
+    ] as unknown as Lure[]
     const events = [
       { lure_id: 'a', event_type: 'casts_recorded', cast_quantity: 20 },
       { lure_id: 'a', event_type: 'bite' },
@@ -51,11 +51,11 @@ describe('analytics helpers', () => {
       { lure_id: 'b', event_type: 'casts_recorded', cast_quantity: 10 },
       { lure_id: 'b', event_type: 'bite' },
       { lure_id: 'b', event_type: 'bite' },
-    ] as FishingEvent[]
+    ] as unknown as FishingEvent[]
     const catches = [
       { lure_id: 'a' }, { lure_id: 'a' }, { lure_id: 'a' },
       { lure_id: 'b' }, { lure_id: 'b' },
-    ] as CatchRecord[]
+    ] as unknown as CatchRecord[]
 
     const rows = buildLureRanking(events, catches, lures)
     const a = rows.find((row) => row.lureId === 'a')!
@@ -77,19 +77,19 @@ describe('analytics helpers', () => {
   })
 
   it('excludes events and catches from trips outside the requested trip set', () => {
-    const trips = [{ id: 'completed', ended_at: '2026-08-14T02:00:00Z' }] as FishingTrip[]
+    const trips = [{ id: 'completed', ended_at: '2026-08-14T02:00:00Z' }] as unknown as FishingTrip[]
     const events = [
       { trip_id: 'completed', lure_id: 'a', event_type: 'setup_selected', event_time: '2026-08-14T01:00:00Z' },
       { trip_id: 'completed', lure_id: 'a', event_type: 'casts_recorded', cast_quantity: 10 },
       { trip_id: 'active', lure_id: 'a', event_type: 'casts_recorded', cast_quantity: 90 },
       { trip_id: 'active', lure_id: 'a', event_type: 'bite' },
-    ] as FishingEvent[]
+    ] as unknown as FishingEvent[]
     const catches = [
       { trip_id: 'completed', lure_id: 'a' },
       { trip_id: 'active', lure_id: 'a' },
       { trip_id: 'active', lure_id: 'a' },
-    ] as CatchRecord[]
-    const lures = [{ id: 'a', product_name: 'Lure A', primary_colour: 'Green' }] as Lure[]
+    ] as unknown as CatchRecord[]
+    const lures = [{ id: 'a', product_name: 'Lure A', primary_colour: 'Green' }] as unknown as Lure[]
 
     const row = buildLurePerformance(trips, events, catches, lures)[0]
     expect(row.casts).toBe(10)
