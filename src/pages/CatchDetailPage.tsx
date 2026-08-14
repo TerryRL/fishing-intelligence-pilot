@@ -43,9 +43,9 @@ export default function CatchDetailPage() {
         <p>{formatDate(row.caught_at)} · {formatTime(row.caught_at)}</p>
       </header>
 
-      <div className="catch-detail-visual">
+      <div style={{ width: '100%', minHeight: 190, maxHeight: 390, border: '1px solid #21455f', borderRadius: 18, overflow: 'hidden', background: '#0c2538', display: 'grid', placeItems: 'center', marginBottom: 18 }}>
         {photoUrl ? (
-          <img src={photoUrl} alt={row.species?.common_name ?? 'Catch'} />
+          <img src={photoUrl} alt={row.species?.common_name ?? 'Catch'} style={{ width: '100%', height: '100%', maxHeight: 390, objectFit: 'contain' }} />
         ) : (
           <FishIcon species={row.species?.common_name} size={170} />
         )}
