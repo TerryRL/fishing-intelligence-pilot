@@ -182,23 +182,25 @@ export default function InsightsPage() {
       <section>
         <div className="section-heading"><h2>Top lures</h2></div>
         <label style={{ marginBottom: 14 }}>Chart metric<select value={chartMetric} onChange={(e) => setChartMetric(e.target.value as ChartMetric)}>{Object.entries(metricLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
-        <div style={{ overflowX: 'auto', border: '1px solid #21445d', borderRadius: 14, background: '#0c2538', padding: '18px 12px 10px' }}>
-          <div style={{ minWidth: 720, height: 260, display: 'flex', alignItems: 'flex-end', gap: 12 }}>
+        <div style={{ width: '100%', border: '1px solid #21445d', borderRadius: 14, background: '#0c2538', padding: '16px 4px 8px', overflow: 'hidden' }}>
+          <div style={{ width: '100%', height: 245, display: 'grid', gridTemplateColumns: `repeat(${Math.max(1, chartRows.length)}, minmax(0, 1fr))`, gap: 0, alignItems: 'end' }}>
             {chartRows.map((row) => {
               const value = row[chartMetric]
-              const height = Math.max(4, (value / chartMax) * 175)
+              const height = Math.max(3, (value / chartMax) * 165)
               const label = chartMetric.endsWith('Pct') ? `${value.toFixed(1)}%` : String(value)
-              return <div key={row.lureId} style={{ flex: '1 0 58px', display: 'grid', alignItems: 'end', justifyItems: 'center', gap: 6 }}>
-                <strong style={{ fontSize: '.72rem', color: '#d7e5ee' }}>{label}</strong>
-                <div style={{ width: '70%', height, minHeight: 4, background: 'linear-gradient(180deg,#55baf7,#347e42)', borderRadius: '8px 8px 3px 3px' }} />
-                <small title={row.name} style={{ width: 70, height: 44, overflow: 'hidden', textAlign: 'center', color: '#91a9ba', fontSize: '.65rem', lineHeight: 1.15 }}>{row.name}</small>
+              return <div key={row.lureId} style={{ minWidth: 0, height: 225, display: 'grid', gridTemplateRows: '24px 165px 36px', alignItems: 'end', justifyItems: 'stretch', gap: 0 }}>
+                <strong style={{ fontSize: '.58rem', textAlign: 'center', color: '#d7e5ee', overflow: 'hidden' }}>{label}</strong>
+                <div style={{ height: 165, display: 'flex', alignItems: 'flex-end' }}>
+                  <div style={{ width: '100%', height, minHeight: 3, background: 'linear-gradient(180deg,#55baf7,#347e42)', borderRadius: '3px 3px 0 0' }} />
+                </div>
+                <small title={row.name} style={{ width: '100%', padding: '3px 1px 0', overflow: 'hidden', textAlign: 'center', color: '#91a9ba', fontSize: '.52rem', lineHeight: 1.05, wordBreak: 'break-word' }}>{row.name.length > 12 ? `${row.name.slice(0, 11)}…` : row.name}</small>
               </div>
             })}
           </div>
         </div>
       </section>
 
-      <p className="insight-note">Percentages use casts as the denominator. A lure with zero casts will show 0%. "Bites + catches" is the sum of logged bite events and landed fish, as requested.</p>
+      <p className="insight-note">Percentages use casts as the denominator. A lure with zero casts will show 0%. "Bites + catches" is the sum of logged bite events and landed fish.</p>
     </div>
   )
 }
