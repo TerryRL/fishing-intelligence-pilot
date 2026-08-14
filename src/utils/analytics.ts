@@ -8,6 +8,18 @@ import type {
 } from '../types/domain'
 import { round } from './format'
 
+export interface LureRankingRow {
+  lureId: string
+  name: string
+  casts: number
+  bites: number
+  catches: number
+  activity: number
+  bitePct: number
+  catchPct: number
+  activityPct: number
+}
+
 export function fishPerHour(fish: number, minutes: number): number {
   if (minutes <= 0) return 0
   return round(fish / (minutes / 60), 2)
@@ -21,6 +33,42 @@ export function per100(count: number, casts: number): number | null {
 export function conversionRate(success: number, attempts: number): number | null {
   if (attempts <= 0) return null
   return round((success / attempts) * 100, 1)
+}
+
+export function interactionCount(bites: number, catches: number): number {
+  return bites + catches
+}
+
+export function landingConversion(bites: number, catches: number): number | null {
+  return conversionRate(catches, interactionCount(bites, catches))
+}
+
+export function buildLureRanking(
+  events: FishingEvent[],
+  catches: CatchRecord[],
+  lures: Lure[],
+): LureRankingRow[] {
+  return lures.map((lure) => {
+    const lureEvents = events.filter((event) => event.lure_id === lure.id)
+    const casts = lureEvents
+      .filter((event) => event.event_type === 'casts_recorded')
+      .reduce((sum, event) => sum + (event.cast_quantity ?? 0), 0)
+    const bites = lureEvents.filter((event) => event.event_type === 'bite').length
+    const landed = catches.filter((catchRow) => catchRow.lure_id === lure.id).length
+    const activity = interactionCount(bites, landed)
+
+    return {
+      lureId: lure.id,
+      name: lure.product_name,
+      casts,
+      bites,
+      catches: landed,
+      activity,
+      bitePct: casts > 0 ? (bites / casts) * 100 : 0,
+      catchPct: casts > 0 ? (landed / casts) * 100 : 0,
+      activityPct: casts > 0 ? (activity / casts) * 100 : 0,
+    }
+  })
 }
 
 function lureMinutesForTrip(
@@ -54,6 +102,7 @@ export function buildLurePerformance(
   catches: CatchRecord[],
   lures: Lure[],
 ): LurePerformance[] {
+  const validTripIds = new Set(trips.map((trip) => trip.id))
   const byLure = new Map<string, {
     minutes: number
     casts: number
@@ -79,7 +128,7 @@ export function buildLurePerformance(
   }
 
   for (const event of events) {
-    if (!event.lure_id) continue
+    if (!validTripIds.has(event.trip_id) || !event.lure_id) continue
     const row = ensure(event.lure_id)
     row.tripIds.add(event.trip_id)
     if (event.event_type === 'casts_recorded') row.casts += event.cast_quantity ?? 0
@@ -87,7 +136,7 @@ export function buildLurePerformance(
   }
 
   for (const catchRow of catches) {
-    if (!catchRow.lure_id) continue
+    if (!validTripIds.has(catchRow.trip_id) || !catchRow.lure_id) continue
     const row = ensure(catchRow.lure_id)
     row.fish += 1
     row.tripIds.add(catchRow.trip_id)
