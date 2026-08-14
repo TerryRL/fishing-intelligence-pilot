@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppData } from '../contexts/AppDataContext'
-import { createCatch, uploadCatchPhoto } from '../services/dataService'
+import { createCatch, signedPhotoUrl, uploadCatchPhoto } from '../services/dataService'
 import FishIcon from '../components/FishIcon'
 
 export default function QuickCatchPage() {
@@ -13,6 +13,7 @@ export default function QuickCatchPage() {
   const [disposition, setDisposition] = useState<'released' | 'kept' | 'unknown'>('released')
   const [notes, setNotes] = useState('')
   const [photo, setPhoto] = useState<File | null>(null)
+  const [speciesPhotoUrls, setSpeciesPhotoUrls] = useState<Record<string, string>>({})
   const [expanded, setExpanded] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -21,6 +22,19 @@ export default function QuickCatchPage() {
     if (!activeTrip) navigate('/start', { replace: true })
     else if (activeTrip.target_species_id) setSpeciesId(activeTrip.target_species_id)
   }, [activeTrip, navigate])
+
+  useEffect(() => {
+    let cancelled = false
+    void Promise.all(
+      species.filter((row) => row.photo_path).map(async (row) => [row.id, await signedPhotoUrl(row.photo_path as string)] as const),
+    ).then((pairs) => {
+      if (cancelled) return
+      const next: Record<string, string> = {}
+      pairs.forEach(([id, url]) => { if (url) next[id] = url })
+      setSpeciesPhotoUrls(next)
+    })
+    return () => { cancelled = true }
+  }, [species])
 
   const quickSpecies = useMemo(() => {
     const target = species.find((s) => s.id === activeTrip?.target_species_id)
@@ -78,7 +92,9 @@ export default function QuickCatchPage() {
               className={`species-choice ${speciesId === row.id ? 'selected' : ''} ${index === 0 ? 'primary-species' : ''}`}
               onClick={() => setSpeciesId(row.id)}
             >
-              <span style={{ width: 44, display: 'grid', placeItems: 'center' }}><FishIcon species={row.common_name} size={42} /></span>
+              <span style={{ width: 44, height: 36, borderRadius: 8, overflow: 'hidden', display: 'grid', placeItems: 'center', background: '#143b58' }}>
+                {speciesPhotoUrls[row.id] ? <img src={speciesPhotoUrls[row.id]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <FishIcon species={row.common_name} size={42} />}
+              </span>
               <strong>{row.common_name}</strong>
               <span>{speciesId === row.id ? '✓' : '›'}</span>
             </button>
