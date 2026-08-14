@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppData } from '../contexts/AppDataContext'
 import { createCatch, uploadCatchPhoto } from '../services/dataService'
+import FishIcon from '../components/FishIcon'
 
 export default function QuickCatchPage() {
   const navigate = useNavigate()
@@ -23,7 +24,7 @@ export default function QuickCatchPage() {
 
   const quickSpecies = useMemo(() => {
     const target = species.find((s) => s.id === activeTrip?.target_species_id)
-    return target ? [target, ...species.filter((s) => s.id !== target.id)].slice(0, 7) : species.slice(0, 7)
+    return target ? [target, ...species.filter((s) => s.id !== target.id)].slice(0, 9) : species.slice(0, 9)
   }, [species, activeTrip?.target_species_id])
 
   async function save() {
@@ -36,7 +37,6 @@ export default function QuickCatchPage() {
         try {
           photoPath = await uploadCatchPhoto(photo)
         } catch {
-          // The catch is more important than the photo. Save the catch and explain below.
           setError('The photo could not upload, but the catch will still be saved.')
         }
       }
@@ -78,7 +78,7 @@ export default function QuickCatchPage() {
               className={`species-choice ${speciesId === row.id ? 'selected' : ''} ${index === 0 ? 'primary-species' : ''}`}
               onClick={() => setSpeciesId(row.id)}
             >
-              <span>◈</span>
+              <span style={{ width: 44, display: 'grid', placeItems: 'center' }}><FishIcon species={row.common_name} size={42} /></span>
               <strong>{row.common_name}</strong>
               <span>{speciesId === row.id ? '✓' : '›'}</span>
             </button>
