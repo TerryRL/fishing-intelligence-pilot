@@ -24,6 +24,7 @@ export default function SettingsPage() {
   const [customWaterTypes, setCustomWaterTypes] = useState<string[]>([])
   const [newWaterType, setNewWaterType] = useState('')
   const [busy, setBusy] = useState(false)
+  const [fishFormOpen, setFishFormOpen] = useState(false)
   const [editingFish, setEditingFish] = useState<Species | null>(null)
   const [fishName, setFishName] = useState('')
   const [fishScientific, setFishScientific] = useState('')
@@ -105,6 +106,7 @@ export default function SettingsPage() {
   }
 
   function startAddFish() {
+    setFishFormOpen(true)
     setEditingFish(null)
     setFishName('')
     setFishScientific('')
@@ -113,12 +115,21 @@ export default function SettingsPage() {
   }
 
   function startEditFish(row: Species) {
+    setFishFormOpen(true)
     setEditingFish(row)
     setFishName(row.common_name)
     setFishScientific(row.scientific_name ?? '')
     setFishPhoto(null)
     setMessage(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function closeFishForm() {
+    setFishFormOpen(false)
+    setEditingFish(null)
+    setFishName('')
+    setFishScientific('')
+    setFishPhoto(null)
   }
 
   async function saveFish() {
@@ -161,10 +172,7 @@ export default function SettingsPage() {
         if (error) throw error
       }
 
-      setEditingFish(null)
-      setFishName('')
-      setFishScientific('')
-      setFishPhoto(null)
+      closeFishForm()
       await refresh()
       setMessage('Fish setup saved.')
     } catch (e) {
@@ -233,17 +241,16 @@ export default function SettingsPage() {
   }
 
   if (view === 'fish') {
-    const formOpen = editingFish !== null || fishName !== '' || fishScientific !== '' || fishPhoto !== null
     return (
       <div className="page">
-        <button className="text-button left" onClick={() => setView('main')}>← Settings</button>
+        <button className="text-button left" onClick={() => { closeFishForm(); setView('main') }}>← Settings</button>
         <header className="page-header">
           <div><p className="eyebrow">SETUP</p><h1>Fish Setup</h1></div>
           <button className="round-add" onClick={startAddFish} aria-label="Add fish">＋</button>
         </header>
         <p className="muted">Default Ontario fish remain shared and safe. Editing a default creates your own private version.</p>
 
-        {formOpen && (
+        {fishFormOpen && (
           <section className="form-card">
             <h2>{editingFish ? 'Edit fish' : 'Add fish'}</h2>
             <label>Fish name<input value={fishName} onChange={(e) => setFishName(e.target.value)} placeholder="e.g. Smallmouth Bass" /></label>
@@ -251,7 +258,7 @@ export default function SettingsPage() {
             <label>Fish photo<input type="file" accept="image/*" capture="environment" onChange={(e) => setFishPhoto(e.target.files?.[0] ?? null)} /></label>
             <div className="button-row">
               <button className="primary-button" disabled={!fishName.trim() || busy} onClick={() => void saveFish()}>{busy ? 'Saving…' : 'Save Fish'}</button>
-              <button className="secondary-button" onClick={() => { setEditingFish(null); setFishName(''); setFishScientific(''); setFishPhoto(null) }}>Cancel</button>
+              <button className="secondary-button" onClick={closeFishForm}>Cancel</button>
             </div>
           </section>
         )}
@@ -286,7 +293,7 @@ export default function SettingsPage() {
         <div className="stack">
           <button className="history-card" onClick={() => navigate('/tackle')}><div><strong>Lure Setup</strong><small>Add, edit, photograph or deactivate lures</small></div><span>›</span></button>
           <button className="history-card" onClick={() => setView('lakes')}><div><strong>Lake Setup</strong><small>Add waterways and create your own waterway types</small></div><span>›</span></button>
-          <button className="history-card" onClick={() => { setView('fish'); startAddFish(); setFishName('') }}><div><strong>Fish Setup</strong><small>Add, edit and photograph fish entries</small></div><span>›</span></button>
+          <button className="history-card" onClick={() => { closeFishForm(); setView('fish') }}><div><strong>Fish Setup</strong><small>Add, edit and photograph fish entries</small></div><span>›</span></button>
         </div>
       </section>
 
