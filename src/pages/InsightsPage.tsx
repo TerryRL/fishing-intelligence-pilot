@@ -1,23 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAppData } from '../contexts/AppDataContext'
 import { requireSupabase } from '../lib/supabase'
+import { buildLureRanking, type LureRankingRow } from '../utils/analytics'
 import type { Lure } from '../types/domain'
 
 type ViewMode = 'all' | 'lake' | 'year' | 'lakeYear'
 type SortKey = 'name' | 'casts' | 'bites' | 'catches' | 'activity' | 'bitePct' | 'catchPct' | 'activityPct'
 type ChartMetric = Exclude<SortKey, 'name'>
-
-type RankingRow = {
-  lureId: string
-  name: string
-  casts: number
-  bites: number
-  catches: number
-  activity: number
-  bitePct: number
-  catchPct: number
-  activityPct: number
-}
 
 const metricLabels: Record<ChartMetric, string> = {
   casts: '# Casts',
@@ -74,24 +63,10 @@ export default function InsightsPage() {
   const relevantEvents = useMemo(() => events.filter((e) => tripIds.has(e.trip_id)), [events, tripIds])
   const relevantCatches = useMemo(() => catches.filter((c) => tripIds.has(c.trip_id)), [catches, tripIds])
 
-  const rows = useMemo<RankingRow[]>(() => allLures.map((lure) => {
-    const lureEvents = relevantEvents.filter((e) => e.lure_id === lure.id)
-    const casts = lureEvents.filter((e) => e.event_type === 'casts_recorded').reduce((sum, e) => sum + (e.cast_quantity ?? 0), 0)
-    const bites = lureEvents.filter((e) => e.event_type === 'bite').length
-    const landed = relevantCatches.filter((c) => c.lure_id === lure.id).length
-    const activity = bites + landed
-    return {
-      lureId: lure.id,
-      name: lure.product_name,
-      casts,
-      bites,
-      catches: landed,
-      activity,
-      bitePct: casts ? (bites / casts) * 100 : 0,
-      catchPct: casts ? (landed / casts) * 100 : 0,
-      activityPct: casts ? (activity / casts) * 100 : 0,
-    }
-  }), [allLures, relevantEvents, relevantCatches])
+  const rows = useMemo<LureRankingRow[]>(
+    () => buildLureRanking(relevantEvents, relevantCatches, allLures),
+    [allLures, relevantEvents, relevantCatches],
+  )
 
   const sortedRows = useMemo(() => [...rows].sort((a, b) => {
     const multiplier = sortDir === 'asc' ? 1 : -1
@@ -99,7 +74,14 @@ export default function InsightsPage() {
     return (a[sortKey] - b[sortKey]) * multiplier
   }), [rows, sortDir, sortKey])
 
-  const chartRows = useMemo(() => [...rows].sort((a, b) => b[chartMetric] - a[chartMetric]).slice(0, 10), [rows, chartMetric])
+  // Keep the same lure order while the user switches chart metrics. Otherwise a 3/2
+  // Bites chart and a 3/2 Catches chart can refer to different lures and look like bad math.
+  const chartRows = useMemo(
+    () => [...rows]
+      .sort((a, b) => b.activity - a.activity || b.catches - a.catches || b.bites - a.bites || a.name.localeCompare(b.name))
+      .slice(0, 10),
+    [rows],
+  )
   const chartMax = Math.max(1, ...chartRows.map((r) => r[chartMetric]))
 
   const totalCasts = relevantEvents.filter((e) => e.event_type === 'casts_recorded').reduce((sum, e) => sum + (e.cast_quantity ?? 0), 0)
@@ -200,7 +182,7 @@ export default function InsightsPage() {
         </div>
       </section>
 
-      <p className="insight-note">Percentages use casts as the denominator. A lure with zero casts will show 0%. "Bites + catches" is the sum of logged bite events and landed fish.</p>
+      <p className="insight-note">Chart lure positions stay fixed when you change metrics so values can be compared directly. Percentages use casts as the denominator. “Bites + catches” is exactly logged bites plus landed catches.</p>
     </div>
   )
 }
