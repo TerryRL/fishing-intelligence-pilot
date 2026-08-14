@@ -12,6 +12,7 @@ import ChangeLurePage from './pages/ChangeLurePage'
 import TacklePage from './pages/TacklePage'
 import TripsPage from './pages/TripsPage'
 import TripDetailPage from './pages/TripDetailPage'
+import CatchDetailPage from './pages/CatchDetailPage'
 import InsightsPage from './pages/InsightsPage'
 import RecommendPage from './pages/RecommendPage'
 import MapPage from './pages/MapPage'
@@ -77,6 +78,7 @@ export default function App() {
         <Route path="/tackle" element={<TacklePage />} />
         <Route path="/trips" element={<TripsPage />} />
         <Route path="/trips/:id" element={<TripDetailPage />} />
+        <Route path="/catches/:id" element={<CatchDetailPage />} />
         <Route path="/insights" element={<InsightsPage />} />
         <Route path="/recommend" element={<RecommendPage />} />
         <Route path="/map" element={<MapPage />} />
