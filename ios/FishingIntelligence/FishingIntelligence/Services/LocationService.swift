@@ -1,4 +1,4 @@
-@preconcurrency import CoreLocation
+import CoreLocation
 import Foundation
 
 @MainActor
@@ -30,13 +30,17 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         }
     }
 
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        continuation?.resume(returning: locations.last?.coordinate)
-        continuation = nil
+    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let coordinate = locations.last?.coordinate
+        Task { @MainActor [weak self] in self?.finish(with: coordinate) }
     }
 
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        continuation?.resume(returning: nil)
+    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        Task { @MainActor [weak self] in self?.finish(with: nil) }
+    }
+
+    private func finish(with coordinate: CLLocationCoordinate2D?) {
+        continuation?.resume(returning: coordinate)
         continuation = nil
     }
 }
