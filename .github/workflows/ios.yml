@@ -29,3 +29,5 @@ jobs:
         run: xcodebuild -resolvePackageDependencies -project ios/FishingIntelligence/FishingIntelligence.xcodeproj -scheme FishingIntelligence
       - name: Compile app and tests
         run: xcodebuild build-for-testing -project ios/FishingIntelligence/FishingIntelligence.xcodeproj -scheme FishingIntelligence -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO
+      - name: Run analytics tests
+        run: xcodebuild test -project ios/FishingIntelligence/FishingIntelligence.xcodeproj -scheme FishingIntelligence -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' CODE_SIGNING_ALLOWED=NO
