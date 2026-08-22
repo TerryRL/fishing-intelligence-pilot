@@ -25,8 +25,6 @@ jobs:
         run: sudo xcode-select --switch /Applications/Xcode_26.3.app/Contents/Developer
       - name: Show Xcode version
         run: xcodebuild -version
-      - name: Resolve Supabase Swift
-        run: xcodebuild -resolvePackageDependencies -project ios/FishingIntelligence/FishingIntelligence.xcodeproj -scheme FishingIntelligence
       - name: Compile app and tests
         run: xcodebuild build-for-testing -project ios/FishingIntelligence/FishingIntelligence.xcodeproj -scheme FishingIntelligence -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO
       - name: Run analytics tests

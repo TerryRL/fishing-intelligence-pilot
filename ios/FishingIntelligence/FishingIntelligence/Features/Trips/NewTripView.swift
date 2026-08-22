@@ -18,11 +18,11 @@ struct NewTripView: View {
             Section("Setup") {
                 Picker("Target species", selection: $speciesID) {
                     Text("No target").tag(UUID?.none)
-                    ForEach(app.species) { Text($0.commonName).tag(Optional($0.id)) }
+                    ForEach(app.activeSpecies) { Text($0.commonName).tag(Optional($0.id)) }
                 }
                 Picker("Starting lure", selection: $lureID) {
                     Text("Choose later").tag(UUID?.none)
-                    ForEach(app.lures) { Text($0.productName).tag(Optional($0.id)) }
+                    ForEach(app.activeLures) { Text($0.productName).tag(Optional($0.id)) }
                 }
             }
             if app.waterBodies.isEmpty {

@@ -7,7 +7,7 @@ struct SpeciesView: View {
     var body: some View {
         List(app.species) { fish in
             HStack(spacing: 12) {
-                RemotePhoto(path: fish.photoPath, fallback: "fish.fill").frame(width: 54, height: 54)
+                LocalPhoto(path: fish.photoPath, fallback: "fish.fill").frame(width: 54, height: 54)
                 VStack(alignment: .leading) {
                     Text(fish.commonName).font(.headline)
                     if let scientificName = fish.scientificName {

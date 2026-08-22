@@ -265,9 +265,9 @@ struct CatchRecord: Codable, Identifiable, Sendable {
     let notes: String?
     let createdAt: Date
     let updatedAt: Date
-    let species: Species?
-    let lure: Lure?
-    let trip: FishingTrip?
+    var species: Species?
+    var lure: Lure?
+    var trip: FishingTrip?
 
     enum CodingKeys: String, CodingKey {
         case id, latitude, longitude, disposition, notes, species, lure, trip

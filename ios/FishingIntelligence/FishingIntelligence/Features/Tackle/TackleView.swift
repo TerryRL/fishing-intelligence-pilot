@@ -8,8 +8,8 @@ struct TackleView: View {
     @State private var pendingDeactivation: Lure?
 
     private var filtered: [Lure] {
-        guard !search.isEmpty else { return app.lures }
-        return app.lures.filter {
+        guard !search.isEmpty else { return app.activeLures }
+        return app.activeLures.filter {
             [$0.productName, $0.manufacturer, $0.category, $0.primaryColour]
                 .compactMap { $0 }
                 .contains { $0.localizedCaseInsensitiveContains(search) }
@@ -19,7 +19,7 @@ struct TackleView: View {
     var body: some View {
         List(filtered) { lure in
             HStack(spacing: 12) {
-                RemotePhoto(path: lure.photoPath, fallback: "shippingbox")
+                LocalPhoto(path: lure.photoPath, fallback: "shippingbox")
                     .frame(width: 58, height: 58)
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {

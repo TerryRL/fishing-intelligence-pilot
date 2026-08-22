@@ -7,7 +7,7 @@ struct CatchDetailView: View {
     var body: some View {
         List {
             Section {
-                RemotePhoto(path: catchRecord.photoPath, fallback: "fish.fill")
+                LocalPhoto(path: catchRecord.photoPath, fallback: "fish.fill")
                     .frame(maxWidth: .infinity, minHeight: 220, maxHeight: 300)
                     .listRowInsets(EdgeInsets())
             }

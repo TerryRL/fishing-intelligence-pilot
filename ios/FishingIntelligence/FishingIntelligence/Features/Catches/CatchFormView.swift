@@ -15,7 +15,7 @@ struct CatchFormView: View {
             Section("Fish") {
                 Picker("Species", selection: $speciesID) {
                     Text("Choose species").tag(UUID?.none)
-                    ForEach(app.species) { Text($0.commonName).tag(Optional($0.id)) }
+                    ForEach(app.activeSpecies) { Text($0.commonName).tag(Optional($0.id)) }
                 }
                 TextField("Length (cm)", text: $length).keyboardType(.decimalPad)
                 TextField("Weight (kg)", text: $weight).keyboardType(.decimalPad)

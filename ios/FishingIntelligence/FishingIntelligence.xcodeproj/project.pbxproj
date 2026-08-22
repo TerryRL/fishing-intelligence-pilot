@@ -5,10 +5,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		A10000000000000000000001 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000002 /* Supabase */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
 		A10000000000000000000003 /* FishingIntelligence.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FishingIntelligence.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000004 /* FishingIntelligenceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FishingIntelligenceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -31,7 +27,7 @@
 		A10000000000000000000007 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
-			files = (A10000000000000000000001 /* Supabase in Frameworks */, );
+			files = ();
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A10000000000000000000008 /* Frameworks */ = {
@@ -76,7 +72,7 @@
 			dependencies = ();
 			fileSystemSynchronizedGroups = (A10000000000000000000005 /* FishingIntelligence */, );
 			name = FishingIntelligence;
-			packageProductDependencies = (A10000000000000000000002 /* Supabase */, );
+			packageProductDependencies = ();
 			productName = FishingIntelligence;
 			productReference = A10000000000000000000003 /* FishingIntelligence.app */;
 			productType = "com.apple.product-type.application";
@@ -117,7 +113,7 @@
 			knownRegions = (en, Base, );
 			mainGroup = A10000000000000000000009;
 			minimizedProjectReferenceProxies = 1;
-			packageReferences = (A10000000000000000000016 /* XCRemoteSwiftPackageReference "supabase-swift" */, );
+			packageReferences = ();
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A1000000000000000000000A /* Products */;
 			projectDirPath = "";
@@ -273,17 +269,6 @@
 		A10000000000000000000010 /* Build configuration list for PBXNativeTarget "FishingIntelligenceTests" */ = {isa = XCConfigurationList; buildConfigurations = (A1000000000000000000001C /* Debug */, A1000000000000000000001D /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		A10000000000000000000016 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/supabase/supabase-swift.git";
-			requirement = {kind = upToNextMajorVersion; minimumVersion = 2.46.0; };
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		A10000000000000000000002 /* Supabase */ = {isa = XCSwiftPackageProductDependency; package = A10000000000000000000016 /* XCRemoteSwiftPackageReference "supabase-swift" */; productName = Supabase; };
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A10000000000000000000014 /* Project object */;
 }

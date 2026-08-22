@@ -48,7 +48,7 @@ struct LureEditorView: View {
             }
             Section("Photo") {
                 if imageData == nil, lure?.photoPath != nil {
-                    RemotePhoto(path: lure?.photoPath, fallback: "shippingbox")
+                    LocalPhoto(path: lure?.photoPath, fallback: "shippingbox")
                         .frame(height: 180)
                 }
                 PhotoInput(imageData: $imageData)

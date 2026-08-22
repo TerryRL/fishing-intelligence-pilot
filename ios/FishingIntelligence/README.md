@@ -1,61 +1,61 @@
 # Fishing Intelligence for iPhone
 
-This is the native SwiftUI companion to the existing React/PWA pilot. It uses the same Supabase Auth users, PostgreSQL tables, row-level security policies, and private `catch-photos` Storage bucket.
+This is the native, local-first SwiftUI version of Fishing Intelligence. It does not require an account, Supabase project, hosted database, or internet connection.
+
+## Where the project lives
+
+The working Git repository is stored at:
+
+`~/Documents/Coding/Fishing App/FishingIntelligence`
+
+Open this Xcode project:
+
+`~/Documents/Coding/Fishing App/FishingIntelligence/ios/FishingIntelligence/FishingIntelligence.xcodeproj`
+
+The older web/PWA source remains in the repository for reference, while the native app is isolated under `ios/`.
+
+## Local data design
+
+- Fishing records are stored in a private SwiftData database on the iPhone.
+- Catch, lure, and species photos are stored in the app's private Application Support folder.
+- No fishing information is sent to a Fishing Intelligence server.
+- The app works offline and does not require sign-in.
+- Deleting the app also deletes its local data unless the user has saved a backup.
+
+In **More → Settings → Backup & Restore**, **Save a Backup** creates one JSON backup containing both the database and referenced photos. Store it in iCloud Drive, on a Mac, or another safe location. **Restore from Backup** replaces the current on-device records after confirmation.
 
 ## What is included
 
-- Email/password sign in and account creation with an iOS deep-link callback
 - Home dashboard and completed-trip fish/hour
 - Trip history, start/resume/end, and confirmed trip deletion
 - Fast active-fishing controls for casts, bites, hooks, lost fish, catches, lure changes, and private spots
-- Catch details, camera/photo library input, and private Supabase photo storage
+- Catch details and camera/photo-library input
 - Native MapKit catch and fishing-spot map with year filtering
-- Tackle add/edit/deactivate, configurable lure categories/colours, favourites, and photos
-- Waterway, custom waterway type, fish species, units, and account settings
+- Tackle add/edit/deactivate, configurable categories/colours, favourites, and photos
+- Waterway, fish species, units, backup, and restore settings
 - Lure rankings, filters, charts, percentages, and corrected strike-to-landed conversion
-- XCTest regression coverage for the core analytics math
+- Automated regression coverage for analytics and local backup persistence
 
 ## First run in Xcode 26.3
 
 1. Open Xcode once and complete any component installation it requests.
-2. In Xcode, choose **Xcode → Settings → Locations → Command Line Tools** and select **Xcode 26.3**.
-3. Open `FishingIntelligence.xcodeproj`.
-4. Wait for Xcode to resolve the official `supabase-swift` package.
-5. Open `FishingIntelligence/Resources/SupabaseConfig.plist` and replace `YOUR_PUBLISHABLE_KEY` with the existing web app's Supabase publishable key. Do not use a service-role key.
-6. Select the **FishingIntelligence** target → **Signing & Capabilities**, choose your Apple development team, and change the bundle identifier if Xcode says it is unavailable.
-7. Choose an iPhone Simulator and press **Run**.
+2. Choose **Xcode → Settings → Locations → Command Line Tools** and select **Xcode 26.3**.
+3. Open `FishingIntelligence.xcodeproj` from the Documents path above.
+4. Select the **FishingIntelligence** target → **Signing & Capabilities** and choose your Apple development team.
+5. Choose an iPhone Simulator and press **Run**.
 
-The project URL is already set to the existing pilot project:
+There is no API key or backend configuration step.
 
-`https://ipckhllhrjnnswutqnzm.supabase.co`
+## Verification
 
-## One Supabase dashboard change
-
-In **Supabase → Authentication → URL Configuration → Redirect URLs**, add:
-
-`fishing-intelligence://auth-callback`
-
-Keep the existing GitHub Pages redirect URL as well. The iOS app supplies this callback during sign-up, and SwiftUI handles the returning email-confirmation link.
-
-No database migration is required for this scaffold. It targets the schema and final setup patch already present under the repository's `supabase/` directory.
-
-## Local verification
-
-After the command-line tools are selected, run:
+After Xcode's command-line tools are selected, run:
 
 ```sh
 ./ios/FishingIntelligence/scripts/build.sh
 ```
 
-In Xcode, press **Command-U** to run `AnalyticsEngineTests` in an installed iPhone Simulator.
+In Xcode, press **Command-U** to run the automated tests in an installed iPhone Simulator.
 
 ## Codex and Xcode workflow
 
-Codex and Xcode do not need a plug-in connection to each other. They collaborate through this repository:
-
-1. Codex reads and edits the Swift/Xcode files.
-2. Xcode resolves packages, signs, builds, and runs those same files.
-3. Codex can use `xcodebuild` for repeatable build checks after Xcode's command-line tools are selected.
-4. Changes go through a `codex/…` Git branch and draft pull request before merging into `main`.
-
-The existing PWA remains deployable from the repository root; the native app is isolated under `ios/`.
+Codex and Xcode work on the same repository. Codex edits the project under Documents; Xcode builds and runs those same files. Changes use a `codex/…` Git branch and a draft pull request before merging into `main`.

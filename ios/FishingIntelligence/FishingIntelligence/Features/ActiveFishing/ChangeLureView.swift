@@ -5,12 +5,12 @@ struct ChangeLureView: View {
     @EnvironmentObject private var app: AppModel
 
     var body: some View {
-        List(app.lures) { lure in
+        List(app.activeLures) { lure in
             Button {
                 Task { if await app.changeLure(to: lure.id) { dismiss() } }
             } label: {
                 HStack {
-                    RemotePhoto(path: lure.photoPath, fallback: "shippingbox")
+                    LocalPhoto(path: lure.photoPath, fallback: "shippingbox")
                         .frame(width: 52, height: 52)
                     VStack(alignment: .leading) {
                         Text(lure.productName).font(.headline)
