@@ -1,0 +1,31 @@
+name: Native iOS checks
+
+on:
+  pull_request:
+    paths:
+      - "ios/**"
+      - ".github/workflows/ios.yml"
+  push:
+    branches: [main]
+    paths:
+      - "ios/**"
+      - ".github/workflows/ios.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-for-testing:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 26.3
+        run: sudo xcode-select --switch /Applications/Xcode_26.3.app/Contents/Developer
+      - name: Show Xcode version
+        run: xcodebuild -version
+      - name: Compile app and tests
+        run: xcodebuild build-for-testing -project ios/FishingIntelligence/FishingIntelligence.xcodeproj -scheme FishingIntelligence -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO
+      - name: Run analytics tests
+        run: xcodebuild test -project ios/FishingIntelligence/FishingIntelligence.xcodeproj -scheme FishingIntelligence -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' CODE_SIGNING_ALLOWED=NO
